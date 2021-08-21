@@ -1,0 +1,150 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Space Invaders</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div id="background">
+      <div id="hero"></div>
+      <div id="missiles"></div>
+      <div id="enemies"></div>
+    </div>
+    <script>
+      let hero = {
+        top: 700,
+        left: 575,
+      };
+      let enemies = [
+        { left: 200, top: 100 },
+        { left: 300, top: 100 },
+        { left: 400, top: 100 },
+        { left: 500, top: 100 },
+        { left: 600, top: 100 },
+        { left: 700, top: 100 },
+        { left: 800, top: 100 },
+        { left: 900, top: 100 },
+        { left: 200, top: 175 },
+        { left: 300, top: 175 },
+        { left: 400, top: 175 },
+        { left: 500, top: 175 },
+        { left: 600, top: 175 },
+        { left: 700, top: 175 },
+        { left: 800, top: 175 },
+        { left: 900, top: 175 },
+      ];
+      let missiles = [];
+
+      document.onkeydown = function moveHero(event) {
+        const leftArrow = 37;
+        const rightArrow = 39;
+        const spaceBar = 32;
+
+        if (event.keyCode == leftArrow && hero.left >= 20) {
+          hero.left = hero.left - 10;
+          document.querySelector("#hero").style.left = hero.left;
+        }
+        if (event.keyCode == rightArrow && hero.left <= 1125) {
+          hero.left = hero.left + 10;
+          document.querySelector("#hero").style.left = hero.left;
+        }
+        if (event.keyCode == spaceBar) {
+          missiles.push({ left: hero.left + 20, top: hero.top - 20 });
+          console.log(missiles);
+          drawMissiles();
+        }
+
+        console.log(event.keyCode);
+      };
+
+      function drawMissiles() {
+        document.querySelector("#missiles").innerHTML = ``;
+        missiles.forEach((missile) => {
+          document.querySelector("#missiles").innerHTML += `
+            <div class="missile1" style="left: ${missile.left}; top: ${missile.top}"></div>
+            `;
+        });
+      }
+
+      function drawEnemies() {
+        document.querySelector("#enemies").innerHTML = ``;
+        enemies.forEach((enemy) => {
+          document.querySelector("#enemies").innerHTML += `
+            <div class="enemy" style="left: ${enemy.left}; top: ${enemy.top}"></div>
+            `;
+        });
+      }
+
+      function updateEnemiesPosition() {
+        enemies = enemies.map((pos) => ({ left: pos.left, top: pos.top + 2 }));
+        console.log(enemies);
+      }
+      function updateMissilesPosition() {
+        missiles = missiles.map((pos) => ({
+          left: pos.left,
+          top: pos.top - 20,
+        }));
+        console.log(missiles);
+      }
+
+      function checkCollisions() {
+        for (let enemy in enemies) {
+          for (let missile in missiles) {
+            if (
+              missiles[missile].left >= enemies[enemy].left &&
+              missiles[missile].left <= enemies[enemy].left + 50 &&
+              missiles[missile].top >= enemies[enemy].top &&
+              missiles[missile].top <= enemies[enemy].top + 50
+            ) {
+              console.log("collision happed");
+              enemies.splice(enemy, 1);
+              missiles.splice(missile, 1);
+            }
+          }
+        }
+      }
+
+      drawEnemies();
+      function gameOver(){
+        
+        if(enemies.length==0){
+            console.log('You Win');
+            const container = document.querySelector("#background");
+            const result= document.createElement('div');
+            result.className='result';
+            result.innerText="You Win!!!";
+            container.append(result);
+        }
+      }
+      function gameLost(){
+        enemies.forEach((enemy)=>{
+         if( enemy.top+120==hero.top){
+          const container = document.querySelector("#background");
+            const result= document.createElement('div');
+            result.className='result';
+            result.innerText=`Game Over...
+            You have Lost...
+            `;
+            container.append(result);
+            //document.querySelector('#hero').style.display='none';
+            document.querySelector('#hero').remove();
+            document.onkeydown="";
+            clearInterval(game);
+         }
+        });
+      }
+ 
+      const game=setInterval(() => {
+        checkCollisions();
+        updateEnemiesPosition();
+        drawEnemies();
+        updateMissilesPosition();
+        drawMissiles();
+        gameOver();
+        gameLost();
+      }, 1000 / 60 );
+    </script>
+  </body>
+</html>
